@@ -1,9 +1,13 @@
-ENTRY(_start);
+ENTRY(start);
 
 SECTIONS
 {
     . = 0x40000000;
     .text.boot :  { *(.text.boot) }
+    .text.vector : {
+        . = ALIGN(2048);
+        *(.text.vector)
+    }
     .text :  { *(.text*) }
     .rodata : { *(.rodata*) }
     .data : { *(.data*) }
