@@ -19,3 +19,13 @@ void uart_puts(const char *str){
         str++;
     }
 }
+
+void uart_puthex(uint64_t value){
+    for (int shift = 60; shift >= 0; shift -= 4) {
+        unsigned int nibble = (value >> shift) & 0xF;
+        if (nibble < 10)
+            uart_putc('0' + nibble);
+        else
+            uart_putc('a' + (nibble - 10));
+    }
+}

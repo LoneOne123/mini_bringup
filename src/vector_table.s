@@ -22,7 +22,7 @@ curr_el_sp0_serror:
 // Gruppe 2
 .balign 0x80
 curr_el_spx_sync:
-    b curr_el_spx_sync
+    b exception_handler
 .balign 0x80
 curr_el_spx_irq:
     b curr_el_spx_irq
