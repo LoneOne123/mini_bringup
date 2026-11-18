@@ -27,4 +27,16 @@ static inline uint64_t read_far_el1(void) {
     return far_el1;
 }
 
+static inline uint64_t read_cntfrq_el0(void) {
+    uint64_t cntfrq_el0;
+    __asm__ volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
+    return cntfrq_el0;
+}
+
+static inline uint64_t read_cntpct_el0(void) {
+    uint64_t cntpct_el0;
+    __asm__ volatile("isb\nmrs %0, cntpct_el0" : "=r"(cntpct_el0));
+    return cntpct_el0;
+}
+
 #endif
