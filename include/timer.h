@@ -3,5 +3,6 @@
 #include <stdint.h>
 
 void delay_ms(uint64_t ms);
+void delay_ms_timer(uint64_t ms);
 
 #endif
