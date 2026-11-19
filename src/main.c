@@ -14,7 +14,7 @@ int main(void){
         uart_puts("CNTPCT_EL0: 0x");
         uart_puthex(read_cntpct_el0());
         uart_puts("\n");
-        delay_ms(1000);
+        delay_ms_timer(1000);
     }
     return 0;
 }
