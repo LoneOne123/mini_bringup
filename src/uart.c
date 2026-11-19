@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <uart.h>
 
 #define UART_DATA_REG (*(volatile uint32_t*)0x09000000)
 #define UART_FLAG_REG (*(volatile uint32_t*)0x09000018)
