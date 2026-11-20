@@ -25,7 +25,7 @@ curr_el_spx_sync:
     b exception_handler
 .balign 0x80
 curr_el_spx_irq:
-    b curr_el_spx_irq
+    b exception_entry
 .balign 0x80
 curr_el_spx_fiq:
     b curr_el_spx_fiq

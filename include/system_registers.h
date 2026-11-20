@@ -53,4 +53,8 @@ static inline uint64_t read_cntp_ctl_el0(void){
     return cntp_ctl_el0;
 }
 
+static inline void enable_irq(void){
+    __asm__ volatile("msr daifclr, #2" : : : "memory");
+}
+
 #endif
