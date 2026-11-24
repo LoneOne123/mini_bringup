@@ -14,55 +14,22 @@ static size_t ft_strlen(const char *s){
 	return (i);
 }
 
-static void ft_putnbr(int n){
-	long int	nb;
-	char		c;
+static void pl_unsigned(unsigned long n, unsigned long base, const char *digits, int *count){
+	if (n >= base){
+		pl_unsigned(n/base, base, digits, count);
+	}
+	uart_putc(digits[n % base]);
+	*count += 1;
+}
 
-	nb = (long int) n;
-	if (nb < 0){
+static void pl_signed(long n, int *count){
+	if (n < 0){
 		uart_putc('-');
-        nb *= -1;
-	}
-	if (nb > 9){
-        ft_putnbr(nb / 10);
-    }
-	c = (nb % 10) + '0';
-    uart_putc(c);
-}
-
-static void ft_putunbr(unsigned int nb){
-	if (nb > 9){
-        ft_putunbr(nb / 10);
-    }
-    ft_putnbr(nb % 10);
-}
-
-
-static void pl_uint(unsigned int nb, int *count){
-	ft_putunbr(nb);
-	while (nb / 10 != 0){
-		nb /= 10;
 		*count += 1;
+		pl_unsigned(0UL - (unsigned long) n, 10UL, "0123456789", count);
 	}
-	*count += 1;
-}
-
-static void pl_int(int nb, int *count){
-	if (nb < 0)
-		*count += 1;
-	ft_putnbr(nb);
-	while (nb / 10 != 0){
-		nb /= 10;
-		*count += 1;
-	}
-	*count += 1;
-}
-
-static void num_to_hex(unsigned long num, int *count){
-	if (num > 15)
-		num_to_hex(num / 16, count);
-	uart_putc("0123456789abcdef"[num % 16]);
-    *count += 1;
+	else
+		pl_unsigned((unsigned long) n, 10UL, "0123456789", count);
 }
 
 static void pl_pointer(void *pointer, int *count){
@@ -76,7 +43,7 @@ static void pl_pointer(void *pointer, int *count){
 	uart_puts("0x");
     *count += 2;
 	ptr = (unsigned long) pointer;
-	num_to_hex(ptr, count);
+	pl_unsigned(ptr, 16UL, "0123456789abcdef", count);
 }
 
 static void pl_str(char *str, int *count){
@@ -94,28 +61,6 @@ static void pl_char(char c, int *count){
 	*count += 1;
 }
 
-static void nb_to_hex(unsigned int nb, int *count){
-	if (nb > 15)
-		nb_to_hex(nb / 16, count);
-	uart_putc("0123456789abcdef"[nb % 16]);
-    *count += 1;
-}
-
-static void pl_hex_low(unsigned int nb, int *count){
-	nb_to_hex(nb, count);
-}
-
-static void nb_to_hex_up(unsigned int nb, int *count){
-	if (nb > 15)
-		nb_to_hex_up(nb / 16, count);
-	uart_putc("0123456789ABCDEF"[nb % 16]);
-    *count += 1;
-}
-
-static void pl_hex_up(unsigned int nb, int *count){
-	nb_to_hex_up(nb, count);
-}
-
 static int pl_wrong(const char *format, int *count, int *i){
 	if (format[*i] == 0)
 		return (0);
@@ -129,20 +74,38 @@ static int pl_wrong(const char *format, int *count, int *i){
 
 static int put_arg(const char *format, int *i, int *count, va_list *args){
 	*i = *i + 1;
+	int is_long = 0;
+	if (format[*i] == 'l') {
+		is_long = 1;
+		*i = *i + 1;
+	}
 	if (format[*i] == 'c')
 		pl_char(va_arg(*args, int), count);
 	else if (format[*i] == 's')
 		pl_str(va_arg(*args, char *), count);
-	else if (format[*i] == 'p')
+	else if (format[*i] == 'p'){
 		pl_pointer(va_arg(*args, void *), count);
+	}
 	else if (format[*i] == 'i' || format[*i] == 'd')
-		pl_int(va_arg(*args, int), count);
+		if (!is_long)
+			pl_signed(va_arg(*args, int), count);
+		else
+			pl_signed(va_arg(*args, long), count);
 	else if (format[*i] == 'u')
-		pl_uint(va_arg(*args, unsigned int), count);
+		if (!is_long)
+			pl_unsigned(va_arg(*args, unsigned int), 10UL, "0123456789", count);
+		else
+			pl_unsigned(va_arg(*args, unsigned long), 10UL, "0123456789", count);
 	else if (format[*i] == 'x')
-		pl_hex_low(va_arg(*args, unsigned int), count);
+		if (!is_long)
+			pl_unsigned(va_arg(*args, unsigned int), 16UL, "0123456789abcdef", count);
+		else
+			pl_unsigned(va_arg(*args, unsigned long), 16UL, "0123456789abcdef", count);
 	else if (format[*i] == 'X')
-		pl_hex_up(va_arg(*args, unsigned int), count);
+		if (!is_long)
+			pl_unsigned(va_arg(*args, unsigned int), 16UL, "0123456789ABCDEF", count);
+		else
+			pl_unsigned(va_arg(*args, unsigned long), 16UL, "0123456789ABCDEF", count);
 	else if (format[*i] == '%'){
         uart_putc('%');
 		*count += 1;
