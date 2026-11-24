@@ -8,8 +8,9 @@
 #define CNTP_CTL_ENABLE 0x1
 
 int main(void){
-    uart_puts("Hello world from bare metal!\n");
+    kprintf("Hello world from bare metal!\n");
 
+    kprintf("%ld %ld %lx %lX %lu\n", -42L, (-9223372036854775807L - 1), 0xdeadbeefcafeUL, 0xdeadbeefcafeUL, 18446744073709551615UL);
     int n = kprintf("%s|%c|%d|%u|%x|%X|%p|%%|%i\n", "hi", 'A', -42, 42u, 255u, 255u, (void *)0x40001234, 7);
     kprintf("n=%d\n", n);
 

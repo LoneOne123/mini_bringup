@@ -1,21 +1,12 @@
-#include "uart.h"
+#include "kprintf.h"
 #include "system_registers.h"
 
 void exception_handler(void)
 {
-    uart_puts("\n*** EXCEPTION ***\n");
-
-    uart_puts("ESR_EL1: 0x");
-    uart_puthex(read_esr_el1());
-    uart_puts("\n");
-
-    uart_puts("ELR_EL1: 0x");
-    uart_puthex(read_elr_el1());
-    uart_puts("\n");
-
-    uart_puts("FAR_EL1: 0x");
-    uart_puthex(read_far_el1());
-    uart_puts("\n");
+    kprintf("\n*** EXCEPTION ***\n");
+    kprintf("ESR_EL1 = 0x%lx\n", read_esr_el1());
+    kprintf("ELR_EL1 = 0x%lx\n", read_elr_el1());
+    kprintf("FAR_EL1 = 0x%lx\n", read_far_el1());
 
     for (;;)
         __asm__ volatile("wfe");
